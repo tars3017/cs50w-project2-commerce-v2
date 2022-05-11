@@ -81,7 +81,7 @@ def create_listing(request):
             bid = form.money
             img_link = form.img
             new_auction = auction_list(item=name, price=bid, image=img_link, desc=description)
-            return HttpResponseRedirect(reverse("/"))
+            return HttpResponseRedirect(reverse("index/"))
         else :
             return render(request, 'auctions/add_list.html', {
                 "form": form
@@ -90,4 +90,5 @@ def create_listing(request):
         "form": NewListForm()
     })
             
-    
+def listing(request):
+    return render(request, )
