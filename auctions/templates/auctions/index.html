@@ -9,6 +9,9 @@
             <div>{{ item.item }}</div>
             <div>Price: {{ item.price }}</div>
             <div>Created {{ item.create_date }}</div>
+            {% if current_login in item.watch_user %}
+                <div>watched</div>
+            {% endif %}
         </div>
         
     {% endfor %}

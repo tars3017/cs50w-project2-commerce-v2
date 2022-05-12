@@ -10,8 +10,11 @@ from django import forms
 
 def index(request):
     al = auction_list.objects.all()
+    for item in al.users.all():
+        print(item)
     return render(request, "auctions/index.html", {
-        "all_item": al
+        "all_item": al,
+        "current_login": request.user
     })
 
 
