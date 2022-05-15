@@ -4,17 +4,14 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 
-from .models import User, auction_list
+from .models import User, auction_list, watch_list
 from django import forms
 
 
 def index(request):
     al = auction_list.objects.all()
-    for item in al.users.all():
-        print(item)
     return render(request, "auctions/index.html", {
-        "all_item": al,
-        "current_login": request.user
+        "all_item": al
     })
 
 
@@ -93,5 +90,5 @@ def create_listing(request):
         "form": NewListForm()
     })
             
-def listing(request):
-    return render(request, )
+def show_watch_list(request):
+    TODO
