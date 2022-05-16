@@ -6,6 +6,7 @@ from django.urls import reverse
 
 from .models import User, auction_list, watch_list
 from django import forms
+from django.contrib.auth.decorators import login_required
 
 
 def index(request):
@@ -66,12 +67,14 @@ def register(request):
     else:
         return render(request, "auctions/register.html")
 
+
 class NewListForm(forms.Form):
     name = forms.CharField(label="Item name")
     description = forms.CharField(label="Description", widget=forms.Textarea() )
     money = forms.IntegerField(label="Starting Bid")
     img = forms.CharField(label="Image Link")
 
+# @login_required
 def create_listing(request):
     if request.method == 'POST':
         form = NewListForm(request.POST)
@@ -89,10 +92,27 @@ def create_listing(request):
     return render(request, 'auctions/add_list.html', {
         "form": NewListForm()
     })
-            
+
+# @login_required            
 def show_watch_list(request):
     cur_watch_list = watch_list.objects.all().get(user=request.user)
     print(cur_watch_list.all_list)
     return render(request, 'auctions/watch_list.html', {
         "items": cur_watch_list.all_list.all()
     })
+
+def show_list(request):
+    all_items = auction_list.objects.all()
+    print(all_items)
+    cur_watch_list = []
+    cur_watch_list = watch_list.objects.all().get(user=request.user).all_list.all()
+    
+    return render(request, 'auctions/listing.html', {
+        "all_items": all_items,
+        "watch_list_items": cur_watch_list
+    })
+
+class AddWatchList(forms.Form):
+    item_name = forms.CharField()
+def add_watch_list(request):
+    
