@@ -19,8 +19,8 @@ class bid(models.Model):
 
 
 class watch_list(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    all_list = models.ManyToManyField(auction_list, blank=True, related_name='watch_lists')
+    user = models.ForeignKey('User', on_delete=models.CASCADE)
+    all_list = models.ManyToManyField('auction_list', blank=True, related_name='now_watch')
 
     def __str__(self):
         return f"{self.id}: {self.user}"

@@ -91,4 +91,8 @@ def create_listing(request):
     })
             
 def show_watch_list(request):
-    TODO
+    cur_watch_list = watch_list.objects.all().get(user=request.user)
+    print(cur_watch_list.all_list)
+    return render(request, 'auctions/watch_list.html', {
+        "items": cur_watch_list.all_list.all()
+    })
