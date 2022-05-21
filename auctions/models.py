@@ -19,7 +19,7 @@ class bid(models.Model):
 
 
 class watch_list(models.Model):
-    user = models.ForeignKey('User', on_delete=models.CASCADE)
+    user = models.ForeignKey('User', on_delete=models.CASCADE, related_name="user")
     all_list = models.ManyToManyField('auction_list', blank=True, related_name='now_watch')
 
     def __str__(self):

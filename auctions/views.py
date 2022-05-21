@@ -112,7 +112,14 @@ def show_list(request):
         "watch_list_items": cur_watch_list
     })
 
-class AddWatchList(forms.Form):
-    item_name = forms.CharField()
-def add_watch_list(request):
-    
+def add_watch_list(request, target):
+    print(auction_list.objects.get(item=target))
+    cur_item = auction_list.objects.get(item=target)
+    cur_watch_list = watch_list.objects.get(user=request.user)
+    if cur_item in cur_watch_list.all_list.all():
+        cur_watch_list.all_list.remove(cur_item)
+        cur_watch_list.save()
+    else:
+        cur_watch_list.all_list.add(cur_item)
+        cur_watch_list.save()
+    return HttpResponseRedirect(reverse("listings"))
