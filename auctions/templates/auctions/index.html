@@ -2,14 +2,17 @@
 
 {% block body %}
     <h2>Active Listings</h2>
-    
+    {% if error != None %} 
+        <h3>{{ error }}</h3>
+    {% endif %}
     {% for item in all_item %}
     
     <div>
         <image src="{{item.image}}" width="300"></image>
         <div>{{ item.item }}</div>
-        <div>Price: {{ item.price }}</div>
+        <div>Cureent Price: {{ item.price }}</div>
         <div>Created {{ item.create_date }}</div>
+        <div>Description: {{ item.desc }}</div>
     </div>
     
     {% endfor %}

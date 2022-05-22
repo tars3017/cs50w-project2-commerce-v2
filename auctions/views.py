@@ -93,23 +93,32 @@ def create_listing(request):
         "form": NewListForm()
     })
 
-# @login_required            
-def show_watch_list(request):
-    cur_watch_list = watch_list.objects.all().get(user=request.user)
-    print(cur_watch_list.all_list)
-    return render(request, 'auctions/watch_list.html', {
-        "items": cur_watch_list.all_list.all()
-    })
+# # @login_required            
+# def show_watch_list(request):
+#     cur_watch_list = watch_list.objects.all().get(user=request.user)
+#     print(cur_watch_list.all_list)
+#     return render(request, 'auctions/watch_list.html', {
+#         "items": cur_watch_list.all_list.all()
+#     })
 
-def show_list(request):
+def show_watch_list(request):
     all_items = auction_list.objects.all()
     print(all_items)
-    cur_watch_list = []
-    cur_watch_list = watch_list.objects.all().get(user=request.user).all_list.all()
-    
-    return render(request, 'auctions/listing.html', {
+    # cur_watch_list = []
+    cur_watch_list = watch_list.objects.all().filter(user=request.user)
+    print("###")
+    print(cur_watch_list)
+    print("###")
+    if not cur_watch_list.exists():
+        print("here")
+        return render(request, 'auctions/index.html', {
+            "error": "No items in watch list"
+        })
+    count = cur_watch_list.get(user=request.user).all_list.all()
+    print(count)
+    return render(request, 'auctions/watch_list.html', {
         "all_items": all_items,
-        "watch_list_items": cur_watch_list
+        "watch_list_items": cur_watch_list.get(user=request.user).all_list.all()
     })
 
 def add_watch_list(request, target):
@@ -122,4 +131,4 @@ def add_watch_list(request, target):
     else:
         cur_watch_list.all_list.add(cur_item)
         cur_watch_list.save()
-    return HttpResponseRedirect(reverse("listings"))
+    return HttpResponseRedirect(reverse("watchlist"))

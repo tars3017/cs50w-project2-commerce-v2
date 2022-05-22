@@ -24,9 +24,11 @@
                 <li class="nav-item">
                     <a class="nav-link" href="{% url 'create_listing' %}">Create Listing</a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'watch_list' %}">My Watch List</a>
-                </li>
+                {% if 1%}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'watchlist' %}">Watch List<span>{{ watch_list_count }}</span></a>
+                    </li>
+                {% endif %}
                 <li class="nav-item">
                     <a class="nav-link" href="{% url 'logout' %}">Log Out</a>
                 </li>
