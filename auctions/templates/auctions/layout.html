@@ -26,7 +26,7 @@
                 </li>
                 {% if 1%}
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'watchlist' %}">Watch List<span>{{ watch_list_count }}</span></a>
+                        <a class="nav-link" href="{% url 'watchlist' %}">Watch List<span>({{ watch_list_items.count }})</span></a>
                     </li>
                 {% endif %}
                 <li class="nav-item">

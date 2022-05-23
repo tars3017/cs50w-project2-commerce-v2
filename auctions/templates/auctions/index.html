@@ -13,6 +13,22 @@
         <div>Cureent Price: {{ item.price }}</div>
         <div>Created {{ item.create_date }}</div>
         <div>Description: {{ item.desc }}</div>
+        {% if user.is_authenticated %}
+            {% if item in watch_list_items %}
+                <form action="{% url 'add_watch_list' item.item %}" method="post">
+                    {% csrf_token %}
+                    <input type="submit" value="&#128681; Remove From Watch List">
+                </form>
+                <!-- <div>&#128064; Watching</div> -->
+            {% else %}
+                <form action="{% url 'add_watch_list' item.item %}" method="post">
+                    {% csrf_token %}
+                    <!-- <input type="hidden" name="item_name" value={{item.item}}> -->
+                    <input type="submit" value="&#128064; Add to watch list">
+                    <!-- <button>&#10133; Add to watch list</button> -->
+                </form>
+            {% endif %}
+        {% endif %}
     </div>
     
     {% endfor %}

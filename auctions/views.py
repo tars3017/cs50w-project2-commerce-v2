@@ -11,8 +11,15 @@ from django.contrib.auth.decorators import login_required
 
 def index(request):
     al = auction_list.objects.all()
+    if request.user.is_authenticated and watch_list.objects.all().filter(user=request.user).exists():
+        print("hhhhhhh")
+        return render(request, "auctions/index.html", {
+        "all_item": al,
+        "watch_list_items": watch_list.objects.all().filter(user=request.user).get(user=request.user).all_list.all()
+    })
+        
     return render(request, "auctions/index.html", {
-        "all_item": al
+        "all_item": al,
     })
 
 
@@ -58,6 +65,9 @@ def register(request):
         try:
             user = User.objects.create_user(username, email, password)
             user.save()
+
+            watch_list.objects.add(user)
+            watch_list.save()
         except IntegrityError:
             return render(request, "auctions/register.html", {
                 "message": "Username already taken."
@@ -87,10 +97,12 @@ def create_listing(request):
             return HttpResponseRedirect(reverse("index/"))
         else :
             return render(request, 'auctions/add_list.html', {
-                "form": form
+                "form": form,
+                "watch_list_items": watch_list.objects.all().filter(user=request.user).get(user=request.user).all_list.all()
             })
     return render(request, 'auctions/add_list.html', {
-        "form": NewListForm()
+        "form": NewListForm(),
+        "watch_list_items": watch_list.objects.all().filter(user=request.user).get(user=request.user).all_list.all()
     })
 
 # # @login_required            
@@ -101,34 +113,32 @@ def create_listing(request):
 #         "items": cur_watch_list.all_list.all()
 #     })
 
+@login_required
 def show_watch_list(request):
     all_items = auction_list.objects.all()
     print(all_items)
     # cur_watch_list = []
     cur_watch_list = watch_list.objects.all().filter(user=request.user)
-    print("###")
-    print(cur_watch_list)
-    print("###")
-    if not cur_watch_list.exists():
-        print("here")
-        return render(request, 'auctions/index.html', {
-            "error": "No items in watch list"
-        })
-    count = cur_watch_list.get(user=request.user).all_list.all()
-    print(count)
+    # print('ffff')
+    # print(cur_watch_list.get(user=request.user).all_list.all().count)
+    # print('ffff')
+    # if cur_watch_list.get(user=request.user).all_list.all().count:
+    #     return render(request, 'auctions/index.html', {
+    #         "error": "No items in watch list",
+    #     })
     return render(request, 'auctions/watch_list.html', {
         "all_items": all_items,
         "watch_list_items": cur_watch_list.get(user=request.user).all_list.all()
     })
 
 def add_watch_list(request, target):
-    print(auction_list.objects.get(item=target))
+    print(request.path)
     cur_item = auction_list.objects.get(item=target)
     cur_watch_list = watch_list.objects.get(user=request.user)
-    if cur_item in cur_watch_list.all_list.all():
+    if watch_list.objects.all().filter(user=request.user).exists() and cur_item in cur_watch_list.all_list.all():
         cur_watch_list.all_list.remove(cur_item)
         cur_watch_list.save()
     else:
         cur_watch_list.all_list.add(cur_item)
         cur_watch_list.save()
-    return HttpResponseRedirect(reverse("watchlist"))
+    return HttpResponseRedirect(reverse("index"))
