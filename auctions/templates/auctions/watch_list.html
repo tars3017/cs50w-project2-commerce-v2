@@ -8,23 +8,13 @@
         {% for item in all_items %}
             {% if item in watch_list_items %}
                 <div>
-                    <image src="{{item.image}}" width="300"></image>
+                    <a href="{% url 'show_listing' item.item %}">
+                        <image src="{{item.image}}" width="300"></image>
+                    </a>
                     <div>{{ item.item }}</div>
                     <div>Price: {{ item.price }}</div>
                     <div>Created {{ item.create_date }}</div>
-                    {% if user.is_authenticated %}
-                        {% if item in watch_list_items %}
-                            <form action="{% url 'add_watch_list' item.item %}" method="post">
-                                {% csrf_token %}
-                                <input type="submit" value="&#128681; Remove From Watch List">
-                            </form>
-                        {% else %}
-                            <form action="{% url 'add_watch_list' item.item %}" method="post">
-                                {% csrf_token %}
-                                <input type="submit" value="&#128064; Add to watch list">
-                            </form>
-                        {% endif %}
-                    {% endif %}
+                    <div>Description: {{ item.desc }}</div>
                 </div>
             {% endif %}
         {% endfor %}

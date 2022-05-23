@@ -1,0 +1,28 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    <h2>{{ item_object.item }}</h2>
+    
+    <div>
+        <a href="{% url 'show_listing' item_object.item %}">
+            <image src="{{item_object.image}}" width="300"></image>
+        </a>
+        <div>Cureent Price: {{ item_object.price }}</div>
+        <div>Created {{ item_object.create_date }}</div>
+        <div>Description: {{ item_object.desc }}</div>
+        {% if user.is_authenticated %}
+            {% if item_object in watch_list_items %}
+                <form action="{% url 'add_watch_list' item_object.item %}" method="post">
+                    {% csrf_token %}
+                    <input type="submit" value="&#128681; Remove From Watch List">
+                </form>
+            {% else %}
+                <form action="{% url 'add_watch_list' item_object.item %}" method="post">
+                    {% csrf_token %}
+                    <input type="submit" value="&#128064; Add to watch list">
+                </form>
+            {% endif %}
+        {% endif %}
+    </div>    
+    
+{% endblock %}

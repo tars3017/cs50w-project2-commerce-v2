@@ -141,4 +141,12 @@ def add_watch_list(request, target):
     else:
         cur_watch_list.all_list.add(cur_item)
         cur_watch_list.save()
-    return HttpResponseRedirect(reverse("index"))
+    return HttpResponseRedirect(f"/listing/{target}")
+
+
+def show_listing(request, item_name):
+    now_item = auction_list.objects.get(item=item_name)
+    return render(request, 'auctions/listing.html', {
+        "item_object": now_item, 
+        "watch_list_items": watch_list.objects.all().filter(user=request.user).get(user=request.user).all_list.all()
+    })
