@@ -2,12 +2,16 @@
 
 {% block body %}
     <h2>{{ item_object.item }}</h2>
+    {% if msg != None %} 
+        <h3>{{ msg }}</h3>
+    {% endif %}
     
     <div>
         <a href="{% url 'show_listing' item_object.item %}">
             <image src="{{item_object.image}}" width="300"></image>
         </a>
-        <div>Cureent Price: {{ item_object.price }}</div>
+        <div>Start Price: {{ item_object.price }}</div>
+        <div>Cureent Price: {{ item_object.current_bid }}</div>
         <div>Created {{ item_object.create_date }}</div>
         <div>Description: {{ item_object.desc }}</div>
         {% if user.is_authenticated %}
@@ -22,6 +26,12 @@
                     <input type="submit" value="&#128064; Add to watch list">
                 </form>
             {% endif %}
+
+            <form action="{% url 'make_a_bid' item_object.item %}" method="post">
+                {% csrf_token %} 
+                {{ bid_form }}
+                <input type="submit" value="Bid">
+            </form>
         {% endif %}
     </div>    
     

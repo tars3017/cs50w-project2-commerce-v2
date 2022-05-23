@@ -4,9 +4,10 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 
-from .models import User, auction_list, watch_list
+from .models import User, auction_list, watch_list, bid
 from django import forms
 from django.contrib.auth.decorators import login_required
+from django.utils import timezone
 
 
 def index(request):
@@ -91,9 +92,9 @@ def create_listing(request):
         if form.is_valid():
             name = form.name
             description = form.description
-            bid = form.money
+            bbid = form.money
             img_link = form.img
-            new_auction = auction_list(item=name, price=bid, image=img_link, desc=description)
+            new_auction = auction_list(item=name, price=bbid, image=img_link, desc=description)
             return HttpResponseRedirect(reverse("index/"))
         else :
             return render(request, 'auctions/add_list.html', {
@@ -143,10 +144,42 @@ def add_watch_list(request, target):
         cur_watch_list.save()
     return HttpResponseRedirect(f"/listing/{target}")
 
+class newBid(forms.Form):
+    my_bid = forms.IntegerField(label="My Bid")
+
 
 def show_listing(request, item_name):
     now_item = auction_list.objects.get(item=item_name)
     return render(request, 'auctions/listing.html', {
         "item_object": now_item, 
-        "watch_list_items": watch_list.objects.all().filter(user=request.user).get(user=request.user).all_list.all()
+        "watch_list_items": watch_list.objects.all().filter(user=request.user).get(user=request.user).all_list.all(),
+        "bid_form": newBid()
     })
+
+def make_a_bid(request, item_name):
+    print(request.method)
+    form = newBid(request.POST)
+    if form.is_valid():
+        bid_price = form.cleaned_data["my_bid"]
+        cur_price = auction_list.objects.all().get(item=item_name).current_bid
+        # print(type(cur_price))
+        if bid_price > cur_price:
+            new_bid = bid(user=request.user, my_bid=bid_price, my_target=auction_list.objects.all().get(item=item_name))
+            new_bid.save()
+            change_target = auction_list.objects.get(item=item_name)
+            change_target.current_bid = bid_price
+            change_target.save()
+            return HttpResponseRedirect(f"/listing/{item_name}")
+            # return render(request, 'auctions/listing.html', {
+            #     "item_object": auction_list.objects.get(item=item_name),
+            #     "watch_list_items": watch_list.objects.all().filter(user=request.user).get(user=request.user).all_list.all(),
+            #     "bid_form": newBid(),
+            #     "msg": "Successfully Bid!"
+            # })
+        else :
+            return render(request, 'auctions/listing.html', {
+                "item_object": auction_list.objects.get(item=item_name),
+                "watch_list_items": watch_list.objects.all().filter(user=request.user).get(user=request.user).all_list.all(),
+                "bid_form": form,
+                "msg": "Your bid must be higher than current price!"
+            })
