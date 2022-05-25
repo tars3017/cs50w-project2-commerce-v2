@@ -34,3 +34,10 @@ class watch_list(models.Model):
 
     def __str__(self):
         return f"{self.id}: {self.user}"
+
+class winner(models.Model):
+    user = models.ForeignKey('User', on_delete=models.CASCADE, related_name="winner")
+    win_item = models.ForeignKey('auction_list', on_delete=models.CASCADE, related_name="win_item")
+
+    def __str__(self):
+        return f"{self.user} win {self.win_item.item}"

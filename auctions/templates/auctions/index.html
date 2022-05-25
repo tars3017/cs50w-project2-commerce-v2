@@ -5,17 +5,27 @@
     {% if error != None %} 
         <h3>{{ error }}</h3>
     {% endif %}
+
+    <!-- show if win a bid -->
+    {% if user.is_authenticated and win_lists.count %}
+        <h3>You have won the bid!</h3>
+        {% for win in win_lists %} 
+            <div>Won the {{ win.win_item.item }} at {{ win.win_item.current_bid }}$</div>
+        {% endfor %}
+    {% endif %}
+
     {% for item in all_item %}
-    
-    <div>
-        <a href="{% url 'show_listing' item.item %}">
-            <image src="{{item.image}}" width="300"></image>
-        </a>
-        <div>{{ item.item }}</div>
-        <div>Cureent Price: {{ item.price }}</div>
-        <div>Created {{ item.create_date }}</div>
-        <div>Description: {{ item.desc }}</div>
-    </div>
+        {% if not item.closed %} 
+            <div>
+                <a href="{% url 'show_listing' item.item %}">
+                    <image src="{{item.image}}" width="300"></image>
+                </a>
+                <div>{{ item.item }}</div>
+                <div>Cureent Price: {{ item.price }}</div>
+                <div>Created {{ item.create_date }}</div>
+                <div>Description: {{ item.desc }}</div>
+            </div>
+        {% endif %}
     
     {% endfor %}
     

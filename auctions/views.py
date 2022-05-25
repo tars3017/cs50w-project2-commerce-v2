@@ -4,24 +4,40 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 
-from .models import User, auction_list, watch_list, bid
+from .models import User, auction_list, watch_list, bid, winner
 from django import forms
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
+from django.db.models import Max
 
 
-def index(request):
+def index(request):    
     al = auction_list.objects.all()
     if request.user.is_authenticated and watch_list.objects.all().filter(user=request.user).exists():
         print("hhhhhhh")
+        # check if win a bid
+        if winner.objects.all().filter(user=request.user).exists():
+            return render(request, "auctions/index.html", {
+                "all_item": auction_list.objects.all(),
+                "watch_list_items": watch_list.objects.all().filter(user=request.user).get(user=request.user).all_list.all(),
+                "win_lists": winner.objects.all().filter(user=request.user)
+        })
+        else :
+            return render(request, "auctions/index.html", {
+            "all_item": al,
+            "watch_list_items": watch_list.objects.all().filter(user=request.user).get(user=request.user).all_list.all()
+    })
+    # check if win a bid
+    if request.user.is_authenticated and winner.objects.all().filter(user=request.user).exists():
         return render(request, "auctions/index.html", {
-        "all_item": al,
-        "watch_list_items": watch_list.objects.all().filter(user=request.user).get(user=request.user).all_list.all()
+            "all_item": auction_list.objects.all(),
+            "watch_list_items": watch_list.objects.all().filter(user=request.user).get(user=request.user).all_list.all(),
+            "win_lists": winner.objects.all().filter(user=request.user)
     })
-        
-    return render(request, "auctions/index.html", {
-        "all_item": al,
-    })
+    else :
+        return render(request, "auctions/index.html", {
+            "all_item": al,
+        })
 
 
 def login_view(request):
@@ -106,27 +122,11 @@ def create_listing(request):
         "watch_list_items": watch_list.objects.all().filter(user=request.user).get(user=request.user).all_list.all()
     })
 
-# # @login_required            
-# def show_watch_list(request):
-#     cur_watch_list = watch_list.objects.all().get(user=request.user)
-#     print(cur_watch_list.all_list)
-#     return render(request, 'auctions/watch_list.html', {
-#         "items": cur_watch_list.all_list.all()
-#     })
-
 @login_required
 def show_watch_list(request):
     all_items = auction_list.objects.all()
     print(all_items)
-    # cur_watch_list = []
     cur_watch_list = watch_list.objects.all().filter(user=request.user)
-    # print('ffff')
-    # print(cur_watch_list.get(user=request.user).all_list.all().count)
-    # print('ffff')
-    # if cur_watch_list.get(user=request.user).all_list.all().count:
-    #     return render(request, 'auctions/index.html', {
-    #         "error": "No items in watch list",
-    #     })
     return render(request, 'auctions/watch_list.html', {
         "all_items": all_items,
         "watch_list_items": cur_watch_list.get(user=request.user).all_list.all()
@@ -183,3 +183,26 @@ def make_a_bid(request, item_name):
                 "bid_form": form,
                 "msg": "Your bid must be higher than current price!"
             })
+
+def close_bid(request, item_name):
+    close_bid = auction_list.objects.get(item=item_name)
+    close_bid.closed = True
+    close_bid.save()
+
+    item_object = auction_list.objects.get(item=item_name)
+    print(bid.objects.all().filter(my_target=item_object).exists())
+
+    if bid.objects.all().filter(my_target=item_object).exists():
+        winner_bid = bid.objects.all().filter(my_target=item_object).latest('my_bid')
+        print(winner_bid.user)
+        print(winner_bid.my_target)
+        who = winner(user=winner_bid.user, win_item=winner_bid.my_target)
+        who.save()
+        print("add bid")
+    else:
+        print("no bid")
+
+    # if winner_bid["my_bid__max"] is not None:
+    #     print("add winner")
+        # new_winner = winner(user=)
+    return HttpResponseRedirect(f"/listing/{item_name}")
