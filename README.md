@@ -14,3 +14,10 @@ It is a "e-Bay" like commerce website, you can add a item, bid on items, close t
 The icons in the website are from [flaticon.com](https://www.flaticon.com/)
 
 ## Website Screeenshots
+<img src="https://github.com/tars3017/cs50w-project2-commerce-v2/blob/main/Screenshots/Screenshot%20from%202022-05-25%2020-51-28.png">
+<img src="https://github.com/tars3017/cs50w-project2-commerce-v2/blob/main/Screenshots/Screenshot%20from%202022-05-25%2020-51-42.png">
+<img src="https://github.com/tars3017/cs50w-project2-commerce-v2/blob/main/Screenshots/Screenshot%20from%202022-05-25%2020-51-47.png">
+<img src="https://github.com/tars3017/cs50w-project2-commerce-v2/blob/main/Screenshots/Screenshot%20from%202022-05-25%2020-52-11.png">
+<img src="https://github.com/tars3017/cs50w-project2-commerce-v2/blob/main/Screenshots/Screenshot%20from%202022-05-25%2020-52-26.png">
+<img src="https://github.com/tars3017/cs50w-project2-commerce-v2/blob/main/Screenshots/Screenshot%20from%202022-05-25%2020-53-22.png">
+<img src="https://github.com/tars3017/cs50w-project2-commerce-v2/blob/main/Screenshots/Screenshot%20from%202022-05-25%2020-53-42.png">
