@@ -34,6 +34,13 @@
                     {{ bid_form }}
                     <input type="submit" value="Bid">
                 </form>
+
+                <!-- comment form -->
+                <form action="{% url 'leave_comment' item_object.item %}" method="post">
+                    {% csrf_token %} 
+                    {{ leave_comment }}
+                    <input type="submit" value="Post Comment">
+                </form>
             {% endif %}
 
             {% if item_object.owner == request.user and not item_object.closed%} 
@@ -42,6 +49,11 @@
                     <input type="submit" value="&#128123; Close Bid">
                 </form>
             {% endif %}
+
+            <!-- show all comment -->
+            {% for comment in all_comments %} 
+                <div>{{ comment.user }}: {{ comment.words}}<span> at {{ comment.post_time }}</span></div>
+            {% endfor %}
         {% endif %} 
     </div>    
     

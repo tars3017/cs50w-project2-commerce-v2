@@ -4,7 +4,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 
-from .models import User, auction_list, watch_list, bid, winner
+from .models import User, auction_list, watch_list, bid, winner, cmt
 from django import forms
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
@@ -147,13 +147,18 @@ def add_watch_list(request, target):
 class newBid(forms.Form):
     my_bid = forms.IntegerField(label="My Bid")
 
+class commentForm(forms.Form):
+    comment = forms.CharField(label="Comment", widget=forms.Textarea() )
 
 def show_listing(request, item_name):
     now_item = auction_list.objects.get(item=item_name)
+
     return render(request, 'auctions/listing.html', {
         "item_object": now_item, 
         "watch_list_items": watch_list.objects.all().filter(user=request.user).get(user=request.user).all_list.all(),
-        "bid_form": newBid()
+        "bid_form": newBid(),
+        "leave_comment": commentForm(),
+        "all_comments": auction_list.objects.all().get(item=item_name).comment.all()
     })
 
 def make_a_bid(request, item_name):
@@ -206,3 +211,17 @@ def close_bid(request, item_name):
     #     print("add winner")
         # new_winner = winner(user=)
     return HttpResponseRedirect(f"/listing/{item_name}")
+
+
+
+def leave_comment(request, item_name):
+    form = commentForm(request.POST)
+    if form.is_valid():
+        new_comment = cmt(user=request.user, words=form.cleaned_data["comment"])
+        new_comment.save()
+
+        now_item = auction_list.objects.get(item=item_name)
+        now_item.comment.add(new_comment)
+
+        print("successfully leave a piece of comment")
+        return HttpResponseRedirect(f"/listing/{item_name}")
