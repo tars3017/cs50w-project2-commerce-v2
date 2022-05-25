@@ -20,7 +20,7 @@ class auction_list(models.Model):
     price = models.IntegerField(default=0)
     image = models.URLField(max_length=200)
     desc = models.CharField(max_length=500, default='description example')
-    current_bid = models.IntegerField(default=price)
+    current_bid = models.IntegerField(default='')
     owner = models.ForeignKey('User', on_delete=models.CASCADE, related_name="sell_item", default='')
     comment = models.ManyToManyField('cmt', blank=True, related_name='some_words')
     closed = models.BooleanField(default=False)

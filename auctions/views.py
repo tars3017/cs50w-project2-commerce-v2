@@ -101,17 +101,18 @@ class NewListForm(forms.Form):
     money = forms.IntegerField(label="Starting Bid")
     img = forms.CharField(label="Image Link")
 
-# @login_required
+@login_required
 def create_listing(request):
     if request.method == 'POST':
         form = NewListForm(request.POST)
         if form.is_valid():
-            name = form.name
-            description = form.description
-            bbid = form.money
-            img_link = form.img
-            new_auction = auction_list(item=name, price=bbid, image=img_link, desc=description)
-            return HttpResponseRedirect(reverse("index/"))
+            name = form.cleaned_data["name"]
+            description = form.cleaned_data["description"]
+            bbid = form.cleaned_data["money"]
+            img_link = form.cleaned_data["img"]
+            new_auction = auction_list(item=name, price=bbid, image=img_link, desc=description, current_bid=bbid, owner=request.user)
+            new_auction.save()
+            return HttpResponseRedirect(reverse("index"))
         else :
             return render(request, 'auctions/add_list.html', {
                 "form": form,
@@ -132,6 +133,7 @@ def show_watch_list(request):
         "watch_list_items": cur_watch_list.get(user=request.user).all_list.all()
     })
 
+@login_required
 def add_watch_list(request, target):
     print(request.path)
     cur_item = auction_list.objects.get(item=target)
@@ -150,6 +152,7 @@ class newBid(forms.Form):
 class commentForm(forms.Form):
     comment = forms.CharField(label="Comment", widget=forms.Textarea() )
 
+@login_required
 def show_listing(request, item_name):
     now_item = auction_list.objects.get(item=item_name)
 
@@ -161,6 +164,7 @@ def show_listing(request, item_name):
         "all_comments": auction_list.objects.all().get(item=item_name).comment.all()
     })
 
+@login_required
 def make_a_bid(request, item_name):
     print(request.method)
     form = newBid(request.POST)
@@ -186,9 +190,12 @@ def make_a_bid(request, item_name):
                 "item_object": auction_list.objects.get(item=item_name),
                 "watch_list_items": watch_list.objects.all().filter(user=request.user).get(user=request.user).all_list.all(),
                 "bid_form": form,
-                "msg": "Your bid must be higher than current price!"
+                "msg": "Your bid must be higher than current price!",
+                "leave_comment": commentForm(),
+                "all_comments": auction_list.objects.all().get(item=item_name).comment.all()
             })
 
+@login_required
 def close_bid(request, item_name):
     close_bid = auction_list.objects.get(item=item_name)
     close_bid.closed = True
@@ -213,7 +220,7 @@ def close_bid(request, item_name):
     return HttpResponseRedirect(f"/listing/{item_name}")
 
 
-
+@login_required
 def leave_comment(request, item_name):
     form = commentForm(request.POST)
     if form.is_valid():
@@ -225,3 +232,16 @@ def leave_comment(request, item_name):
 
         print("successfully leave a piece of comment")
         return HttpResponseRedirect(f"/listing/{item_name}")
+
+@login_required
+def show_mybids(request):
+    if auction_list.objects.filter(owner=request.user).exists():
+        all_my_bids = auction_list.objects.filter(owner=request.user).all()
+        return render(request, 'auctions/my_bids.html', {
+            "watch_list_items": watch_list.objects.all().filter(user=request.user).get(user=request.user).all_list.all(),
+            "my_bids": all_my_bids
+        })
+    return render(request, 'auctions/my_bids.html', {
+        "watch_list_items": watch_list.objects.all().filter(user=request.user).get(user=request.user).all_list.all(),
+        "no_item": True
+    })

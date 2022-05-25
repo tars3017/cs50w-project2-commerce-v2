@@ -1,0 +1,30 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    <h2>All My Products</h2>
+    
+    {% if no_item %} 
+        <h3>You have no products to sell.</h3>
+    {% else %} 
+        {% for my_bid in my_bids %} 
+            <div>
+                <a href="{% url 'show_listing' my_bid.item %}">
+                    <image src="{{my_bid.image}}" width="300"></image>
+                </a>
+                <div>Start Price: {{ my_bid.price }}</div>
+                <div>Cureent Price: {{ my_bid.current_bid }}</div>
+                <div>Created {{ my_bid.create_date }}</div>
+                <div>Description: {{ my_bid.desc }}</div>
+                {% if my_bid.closed %} 
+                    <div>Closed</div>
+                {% endif %}
+                {% if user.is_authenticated %}
+                    {% for comment in all_comments %} 
+                        <div>{{ comment.user }}: {{ comment.words}}<span> at {{ comment.post_time }}</span></div>
+                    {% endfor %}
+                {% endif %} 
+            </div>
+        {% endfor %}
+    {% endif %}
+    
+{% endblock %}
