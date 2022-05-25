@@ -5,6 +5,15 @@ from django.utils import timezone
 class User(AbstractUser):
     pass
 
+class cmt(models.Model):
+    user = models.ForeignKey('User', on_delete=models.CASCADE, related_name='criticism', default='')
+    words = models.CharField(max_length=500, default='')
+    post_time = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return f"{self.user} leave a comment at {self.post_time}"
+
+
 class auction_list(models.Model):
     item = models.CharField(max_length=64)
     create_date = models.DateTimeField(default=timezone.now)
@@ -13,7 +22,7 @@ class auction_list(models.Model):
     desc = models.CharField(max_length=500, default='description example')
     current_bid = models.IntegerField(default=price)
     owner = models.ForeignKey('User', on_delete=models.CASCADE, related_name="sell_item", default='')
-    comment = models.CharField(max_length=500, default='')
+    comment = models.ManyToManyField('cmt', blank=True, related_name='some_words')
     closed = models.BooleanField(default=False)
   
     def __str__(self):
@@ -34,3 +43,10 @@ class watch_list(models.Model):
 
     def __str__(self):
         return f"{self.id}: {self.user}"
+
+class winner(models.Model):
+    user = models.ForeignKey('User', on_delete=models.CASCADE, related_name="winner")
+    win_item = models.ForeignKey('auction_list', on_delete=models.CASCADE, related_name="win_item")
+
+    def __str__(self):
+        return f"{self.user} win {self.win_item.item}"
